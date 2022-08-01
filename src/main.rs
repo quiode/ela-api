@@ -1,22 +1,33 @@
-use rocket::serde::uuid::Uuid;
+use chrono::Utc;
+use database_interactions::database_interactions::Db;
+use rocket::{
+    fs::{relative, FileServer},
+    serde::uuid::Uuid,
+};
+use rocket_db_pools::Database;
+
+mod database_interactions;
 
 #[macro_use]
 extern crate rocket;
 
 #[post("/ping/<uuid>")]
 fn ping(uuid: Uuid) -> String {
-    uuid.to_string()
+    format!("{}: {}", uuid, Utc::now())
 }
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/api", routes![ping])
+    rocket::build()
+        .attach(Db::init())
+        .mount("/", FileServer::from(relative!("static")))
+        .mount("/api", routes![ping])
 }
 
 #[cfg(test)]
 mod test {
     use super::rocket;
-    use rocket::http::Status;
+    use rocket::http::{ContentType, Status};
     use rocket::local::blocking::Client;
 
     #[test]
@@ -26,6 +37,13 @@ mod test {
         let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client.post(format!("/api/ping/{}", UUID)).dispatch();
         assert_eq!(response.status(), Status::Ok);
-        assert_eq!(response.into_string().unwrap(), UUID);
+    }
+
+    #[test]
+    fn website() {
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
+        let response = client.get("/").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert_eq!(response.content_type().unwrap(), ContentType::HTML);
     }
 }
