@@ -12,5 +12,21 @@ pub mod database_interactions {
     pub mod read {}
 
     /// module that provides functions to write to the database
-    pub mod write {}
+    pub mod write {
+        use rocket::serde::uuid::Uuid;
+        use rocket_db_pools::Connection;
+
+        use super::Db;
+
+        pub async fn save_ping(uuid: Uuid, mut db: Connection<Db>) {}
+    }
+
+    /// module for creating the database
+    mod setup {
+        use rocket_db_pools::Connection;
+
+        use super::Db;
+
+        fn correct_setup(mut db: Connection<Db>) {}
+    }
 }

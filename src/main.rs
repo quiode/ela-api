@@ -1,10 +1,10 @@
 use chrono::Utc;
-use database_interactions::database_interactions::Db;
+use database_interactions::database_interactions::{write::save_ping, Db};
 use rocket::{
     fs::{relative, FileServer},
     serde::uuid::Uuid,
 };
-use rocket_db_pools::Database;
+use rocket_db_pools::{Connection, Database};
 
 mod database_interactions;
 
@@ -12,7 +12,9 @@ mod database_interactions;
 extern crate rocket;
 
 #[post("/ping/<uuid>")]
-fn ping(uuid: Uuid) -> String {
+async fn ping(mut db: Connection<Db>, uuid: Uuid) -> String {
+    save_ping(uuid, db).await;
+
     format!("{}: {}", uuid, Utc::now())
 }
 
