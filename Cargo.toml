@@ -1,16 +1,15 @@
 [package]
 name = "ela-api"
-version = "0.1.0"
+version = "0.5.0"
 edition = "2021"
 
-[dependencies]
-chrono = "0.4.19"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies.chrono]
+version = "0.4.19"
+features = ["serde"]
 
 [dependencies.rocket]
 version = "0.5.0-rc.2"
-features = ["uuid"]
+features = ["uuid", "json"]
 
 [dependencies.rocket_db_pools]
 version = "0.1.0-rc.2"
