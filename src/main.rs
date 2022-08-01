@@ -1,21 +1,38 @@
-use chrono::Utc;
-use database_interactions::database_interactions::{write::save_ping, Db};
 use rocket::{
     fs::{relative, FileServer},
+    http::Status,
     serde::uuid::Uuid,
 };
-use rocket_db_pools::{Connection, Database};
+use rocket_db_pools::{
+    sqlx::{self},
+    Connection, Database,
+};
 
-mod database_interactions;
+#[derive(Database)]
+#[database("db")]
+pub struct Db(sqlx::SqlitePool);
 
 #[macro_use]
 extern crate rocket;
 
 #[post("/ping/<uuid>")]
-async fn ping(mut db: Connection<Db>, uuid: Uuid) -> String {
-    save_ping(uuid, db).await;
+async fn ping(mut db: Connection<Db>, uuid: Uuid) -> Result<String, Status> {
+    let timestamp = chrono::Utc::now().timestamp();
+    let uuid = uuid.to_string();
 
-    format!("{}: {}", uuid, Utc::now())
+    let result: Result<String, Status>;
+
+    match sqlx::query("INSERT INTO pings (uuid, timestamp) VALUES (?,?)")
+        .bind(&uuid)
+        .bind(timestamp)
+        .execute(&mut *db)
+        .await
+    {
+        Ok(_) => result = Ok(format!("{}: {}", uuid, timestamp)),
+        Err(_) => result = Err(Status::InternalServerError),
+    }
+
+    result
 }
 
 #[launch]
