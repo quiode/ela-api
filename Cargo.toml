@@ -3,6 +3,9 @@ name = "ela-api"
 version = "0.5.0"
 edition = "2021"
 
+[dependencies]
+rocket_cors = { git = "https://github.com/lawliet89/rocket_cors.git", rev = "54fae070"  }
+
 [dependencies.chrono]
 version = "0.4.19"
 features = ["serde"]

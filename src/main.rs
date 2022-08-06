@@ -7,6 +7,7 @@ use rocket::{
     http::Status,
     serde::uuid::Uuid,
 };
+use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::{
     sqlx::{self, Row},
     Connection, Database,
@@ -164,8 +165,22 @@ async fn get_data(mut db: Connection<Db>) -> Json<Vec<History>> {
 
 #[launch]
 fn rocket() -> _ {
+    // cors
+    let allowed_origins = AllowedOrigins::some(
+        &["https://team-crystal.ch", "http://team-crystal.ch"],
+        &["localhost:*"],
+    );
+
+    let cors_options = CorsOptions {
+        allowed_origins,
+        ..Default::default()
+    };
+
+    let cors = cors_options.to_cors().unwrap();
+
     rocket::build()
         .attach(Db::init())
+        .attach(cors)
         .mount("/", FileServer::from(relative!("static")))
         .mount("/api", routes![ping, get_data])
 }
