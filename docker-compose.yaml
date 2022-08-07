@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  app:
+    image: quiooo/ela-website
+    restart: always
+    volumes:
+      - /var/lib/ela:/var/lib/ela:rw
+    ports:
+      - "8002:8000"

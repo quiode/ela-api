@@ -166,10 +166,7 @@ async fn get_data(mut db: Connection<Db>) -> Json<Vec<History>> {
 #[launch]
 fn rocket() -> _ {
     // cors
-    let allowed_origins = AllowedOrigins::some(
-        &["https://team-crystal.ch", "http://team-crystal.ch"],
-        &["localhost:*"],
-    );
+    let allowed_origins = AllowedOrigins::All;
 
     let cors_options = CorsOptions {
         allowed_origins,

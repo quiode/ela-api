@@ -1,0 +1,4 @@
+/target
+*.sqlite
+!template.sqlite
+static/**
