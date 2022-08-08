@@ -159,7 +159,6 @@ async fn get_data(mut db: Connection<Db>) -> Json<Vec<History>> {
         }
     }
 
-    // TODO: export all the histories to json and return them
     return Json(histories);
 }
 
